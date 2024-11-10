@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"sync"
 	"web_scraper/set"
 
 	"golang.org/x/net/html"
@@ -39,6 +40,7 @@ func VisitLinks(input_url string, visited_links *set.HashSet[string]) {
 	schema := parsed_url.Scheme
 	fmt.Println(domain)
 	if 400 <= resp.StatusCode && resp.StatusCode < 600 {
+		fmt.Println(resp.StatusCode)
 		DeadLinks = append(DeadLinks, parsed_url.String())
 	} else {
 		ActiveLinks = append(ActiveLinks, parsed_url.String())
@@ -66,7 +68,13 @@ func VisitLinks(input_url string, visited_links *set.HashSet[string]) {
 			}
 		}
 		if !visited_links.Contains(new_link) {
-			VisitLinks(new_link, visited_links)
+			var wg sync.WaitGroup
+			wg.Add(1)
+			go func() {
+				VisitLinks(new_link, visited_links)
+				wg.Done()
+			}()
+			wg.Wait()
 		}
 	}
 }

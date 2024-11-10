@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 	"regexp"
+	"sync"
 	"web_scraper/set"
 )
 
@@ -34,7 +35,13 @@ func (cf *CmdFlags) Execute(deadLinks *Links) {
 			os.Exit(1)
 		}
 		visited_links := set.New[string]()
-		VisitLinks(parsed_url.String(), visited_links)
+		var wg sync.WaitGroup
+		wg.Add(1)
+		go func() {
+			VisitLinks(parsed_url.String(), visited_links)
+			wg.Done()
+		}()
+		wg.Wait()
 	default:
 		log.Println("Invalid option")
 		os.Exit(1)

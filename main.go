@@ -13,7 +13,8 @@ func main() {
 		color.Green("%v\n", activeLinks)
 	}
 	color.Red("Dead links are as follows\n")
-	for _, activeLinks := range ActiveLinks {
-		color.Red("%v\n", activeLinks)
+	for _, deadLinks := range DeadLinks {
+		color.Red("%v\n", deadLinks)
 	}
+
 }
